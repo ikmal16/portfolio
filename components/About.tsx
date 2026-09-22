@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import {
   GraduationCap,
@@ -13,9 +13,44 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
-// Animated stats — count up when scrolled into view
+// Types
 // ─────────────────────────────────────────────────────────────
-const stats = [
+type AccentKey = "sky" | "violet" | "emerald" | "amber";
+
+type Stat = {
+  icon: ComponentType<{
+    size?: number;
+    strokeWidth?: number;
+    className?: string;
+  }>;
+  value: number;
+  suffix: string;
+  label: string;
+  sublabel: string;
+  accent: AccentKey;
+};
+
+type Highlight = {
+  icon: ComponentType<{
+    size?: number;
+    strokeWidth?: number;
+    className?: string;
+  }>;
+  title: string;
+  description: string;
+};
+
+type AccentStyles = {
+  text: string;
+  border: string;
+  glow: string;
+  iconBg: string;
+};
+
+// ─────────────────────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────────────────────
+const stats: Stat[] = [
   {
     icon: GraduationCap,
     value: 1,
@@ -50,7 +85,7 @@ const stats = [
   },
 ];
 
-const highlights = [
+const highlights: Highlight[] = [
   {
     icon: GraduationCap,
     title: "Education",
@@ -68,7 +103,7 @@ const highlights = [
   },
 ];
 
-const ACCENTS = {
+const ACCENTS: Record<AccentKey, AccentStyles> = {
   sky: {
     text: "text-sky-400",
     border: "hover:border-sky-400/40",
@@ -96,29 +131,43 @@ const ACCENTS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Count-up number that animates when in view
+// Count-up number
 // ─────────────────────────────────────────────────────────────
-function CountUp({ value, suffix = "", duration = 1.4, reduceMotion }) {
-  const ref = useRef(null);
+type CountUpProps = {
+  value: number;
+  suffix?: string;
+  duration?: number;
+  reduceMotion: boolean;
+};
+
+function CountUp({
+  value,
+  suffix = "",
+  duration = 1.4,
+  reduceMotion,
+}: CountUpProps) {
+  const ref = useRef<HTMLSpanElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
-  const [display, setDisplay] = useState(reduceMotion ? value : 0);
+
+  // Start directly at the final value if reduced motion is on
+  const [display, setDisplay] = useState<number>(reduceMotion ? value : 0);
 
   useEffect(() => {
-    if (!inView || reduceMotion) {
-      if (reduceMotion) setDisplay(value);
-      return;
-    }
+    if (reduceMotion) return;
+    if (!inView) return;
 
-    let start = 0;
+    const start = 0;
     const startTime = performance.now();
-    const step = (now) => {
+
+    const step = (now: number) => {
       const progress = Math.min((now - startTime) / (duration * 1000), 1);
-      // easeOutCubic
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
       setDisplay(Math.round(start + (value - start) * eased));
       if (progress < 1) requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+
+    const raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [inView, value, duration, reduceMotion]);
 
   return (
@@ -132,8 +181,14 @@ function CountUp({ value, suffix = "", duration = 1.4, reduceMotion }) {
 // ─────────────────────────────────────────────────────────────
 // Stat card
 // ─────────────────────────────────────────────────────────────
-function StatCard({ stat, index, reduceMotion }) {
-  const accent = ACCENTS[stat.accent] || ACCENTS.sky;
+type StatCardProps = {
+  stat: Stat;
+  index: number;
+  reduceMotion: boolean;
+};
+
+function StatCard({ stat, index, reduceMotion }: StatCardProps) {
+  const accent = ACCENTS[stat.accent] ?? ACCENTS.sky;
   const Icon = stat.icon;
 
   return (
@@ -149,15 +204,14 @@ function StatCard({ stat, index, reduceMotion }) {
       whileHover={reduceMotion ? {} : { y: -4 }}
       className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-5 backdrop-blur-sm transition-all duration-500 ${accent.border}`}
     >
-      {/* Cursor glow */}
       <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${accent.glow}`}
+        className={`pointer-events-none absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${accent.glow}`}
       />
 
       <div className="relative">
         <div className="flex items-start justify-between">
           <div
-            className={`rounded-xl border border-white/10 bg-white/[0.03] p-2.5 transition-all duration-500 ${accent.iconBg}`}
+            className={`rounded-xl border border-white/10 bg-white/3 p-2.5 transition-all duration-500 ${accent.iconBg}`}
           >
             <Icon
               size={17}
@@ -188,7 +242,12 @@ function StatCard({ stat, index, reduceMotion }) {
 // ─────────────────────────────────────────────────────────────
 // Highlight row
 // ─────────────────────────────────────────────────────────────
-function HighlightRow({ item, index }) {
+type HighlightRowProps = {
+  item: Highlight;
+  index: number;
+};
+
+function HighlightRow({ item, index }: HighlightRowProps) {
   const Icon = item.icon;
 
   return (
@@ -203,7 +262,7 @@ function HighlightRow({ item, index }) {
       }}
       className="group flex items-start gap-5 border-b border-white/10 py-6 first:pt-0 last:border-b-0"
     >
-      <div className="mt-0.5 rounded-lg border border-white/10 bg-white/[0.03] p-2 transition-colors duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-400/[0.06]">
+      <div className="mt-0.5 rounded-lg border border-white/10 bg-white/3 p-2 transition-colors duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-400/6">
         <Icon
           size={16}
           strokeWidth={1.75}
@@ -224,7 +283,7 @@ function HighlightRow({ item, index }) {
 // Section
 // ─────────────────────────────────────────────────────────────
 export default function About() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotion() ?? false;
 
   return (
     <section
@@ -233,8 +292,8 @@ export default function About() {
     >
       {/* Soft background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-1/3 h-[400px] w-[400px] rounded-full bg-sky-500/[0.05] blur-[120px]" />
-        <div className="absolute -right-40 bottom-1/4 h-[400px] w-[400px] rounded-full bg-violet-500/[0.05] blur-[120px]" />
+        <div className="absolute -left-40 top-1/3 h-100 w-100 rounded-full bg-sky-500/5 blur-[120px]" />
+        <div className="absolute -right-40 bottom-1/4 h-100 w-100 rounded-full bg-violet-500/5 blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
@@ -249,12 +308,11 @@ export default function About() {
           <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             A little about me.
           </h2>
-          <div className="mt-5 h-px w-16 bg-gradient-to-r from-sky-400/80 to-transparent" />
+          <div className="mt-5 h-px w-16 bg-linear-to-r from-sky-400/80 to-transparent" />
         </motion.div>
 
         {/* Main content */}
         <div className="grid gap-16 md:grid-cols-[1.1fr_0.9fr] md:gap-12">
-          {/* About text */}
           <div>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -293,7 +351,6 @@ export default function About() {
               integration, data management, and software research.
             </motion.p>
 
-            {/* Resume button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -307,8 +364,7 @@ export default function About() {
                 rel="noopener noreferrer"
                 className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:border-white/40 hover:bg-white/5"
               >
-                {/* Shine sweep */}
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 <Sparkles size={15} className="text-sky-400" />
                 View My Resume
                 <ArrowUpRight
@@ -329,7 +385,7 @@ export default function About() {
           </div>
         </div>
 
-        {/* ─── Stats strip ─────────────────────────────── */}
+        {/* Stats strip */}
         <div className="mt-20 sm:mt-24">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -338,11 +394,11 @@ export default function About() {
             transition={{ duration: 0.5 }}
             className="mb-8 flex items-center gap-3"
           >
-            <div className="h-px flex-1 bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
+            <div className="h-px flex-1 bg-linear-to-r from-white/10 via-white/5 to-transparent" />
             <span className="text-xs font-medium uppercase tracking-[0.3em] text-gray-500">
               By the numbers
             </span>
-            <div className="h-px flex-1 bg-gradient-to-l from-white/10 via-white/5 to-transparent" />
+            <div className="h-px flex-1 bg-linear-to-l from-white/10 via-white/5 to-transparent" />
           </motion.div>
 
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

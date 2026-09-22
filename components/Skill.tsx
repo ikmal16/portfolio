@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Code2,
   Globe,
@@ -12,7 +12,20 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const skillCategories = [
+// ─────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────
+type SkillCategory = {
+  id: string;
+  icon: typeof Globe;
+  title: string;
+  skills: string[];
+  color: string;
+  border: string;
+  text: string;
+};
+
+const skillCategories: SkillCategory[] = [
   {
     id: "frontend",
     icon: Globe,
@@ -51,7 +64,10 @@ const skillCategories = [
   },
 ];
 
-const containerVariants = {
+// ─────────────────────────────────────────────────────────────
+// Variants — typed with Variants so TS infers literal types
+// ─────────────────────────────────────────────────────────────
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -62,7 +78,7 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
@@ -76,7 +92,7 @@ const cardVariants = {
   },
 };
 
-const skillVariants = {
+const skillVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: {
     opacity: 1,
@@ -87,9 +103,11 @@ const skillVariants = {
 
 export default function Skills() {
   const [activeCategory, setActiveCategory] = useState("frontend");
-  const [hoveredSkill, setHoveredSkill] = useState(null);
+  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
-  const activeSkills = skillCategories.find((c) => c.id === activeCategory);
+  // Fallback to the first category so `activeSkills` is never undefined
+  const activeSkills =
+    skillCategories.find((c) => c.id === activeCategory) ?? skillCategories[0];
 
   return (
     <section
@@ -98,7 +116,7 @@ export default function Skills() {
     >
       {/* Subtle background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-sky-500/5 blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-125 w-125 -translate-x-1/2 rounded-full bg-sky-500/5 blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
@@ -137,7 +155,7 @@ export default function Skills() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   isActive
-                    ? `border-white/20 bg-white/[0.06] ${category.text}`
+                    ? `border-white/20 bg-white/6 ${category.text}`
                     : "border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200"
                 }`}
               >
@@ -156,7 +174,7 @@ export default function Skills() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 -z-10 rounded-full border border-white/20 bg-white/[0.04]"
+                    className="absolute inset-0 -z-10 rounded-full border border-white/20 bg-white/4"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -181,11 +199,11 @@ export default function Skills() {
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-              className={`relative overflow-hidden rounded-2xl border border-white/10 p-6 sm:p-8 lg:col-span-2 ${activeSkills.border} transition-colors duration-500`}
+              className={`relative overflow-hidden rounded-2xl border border-white/10 p-6 transition-colors duration-500 sm:p-8 lg:col-span-2 ${activeSkills.border}`}
             >
               {/* Gradient background */}
               <div
-                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${activeSkills.color} opacity-50`}
+                className={`pointer-events-none absolute inset-0 bg-linear-to-br ${activeSkills.color} opacity-50`}
               />
 
               <div className="relative">
@@ -236,8 +254,8 @@ export default function Skills() {
                       }}
                       className={`relative cursor-default rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
                         hoveredSkill === skill
-                          ? `border-white/30 bg-white/[0.08] text-white`
-                          : "border-white/10 bg-white/[0.03] text-gray-300"
+                          ? `border-white/30 bg-white/8 text-white`
+                          : "border-white/10 bg-white/3 text-gray-300"
                       }`}
                     >
                       {skill}
@@ -245,7 +263,7 @@ export default function Skills() {
                       {hoveredSkill === skill && (
                         <motion.div
                           layoutId="skillGlow"
-                          className={`absolute inset-0 -z-10 rounded-xl bg-gradient-to-r ${activeSkills.color} blur-md`}
+                          className={`absolute inset-0 -z-10 rounded-xl bg-linear-to-r ${activeSkills.color} blur-md`}
                           transition={{
                             type: "spring",
                             stiffness: 300,
@@ -269,7 +287,7 @@ export default function Skills() {
           {/* Side panel: always learning */}
           <motion.div variants={cardVariants} className="flex flex-col gap-4">
             {/* Bonus panel: always learning */}
-            <div className="group relative overflow-hidden rounded-2xl border border-dashed border-white/15 p-6 transition-all duration-500 hover:border-white/25 hover:bg-white/[0.02]">
+            <div className="group relative overflow-hidden rounded-2xl border border-dashed border-white/15 p-6 transition-all duration-500 hover:border-white/25 hover:bg-white/2">
               <div className="flex items-center gap-3">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}

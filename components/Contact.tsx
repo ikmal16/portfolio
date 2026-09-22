@@ -1,15 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType, type MouseEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Mail, ArrowUpRight, Copy, Check, Sparkles } from "lucide-react";
 import GithubIcon from "./icon/GithubIcon";
 import LinkedInIcon from "./icon/LinkedInIcon";
 
 // ─────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────
+type AccentKey = "sky" | "blue" | "violet";
+
+type IconComponent = ComponentType<{
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}>;
+
+type ContactLinkItem = {
+  name: string;
+  value: string;
+  href: string;
+  icon: IconComponent;
+  accent: AccentKey;
+  copyable: boolean;
+};
+
+type AccentStyles = {
+  text: string;
+  hoverBorder: string;
+  hoverBg: string;
+  glow: string;
+  iconBg: string;
+};
+
+// ─────────────────────────────────────────────────────────────
 // Contact data
 // ─────────────────────────────────────────────────────────────
-const contactLinks = [
+const contactLinks: ContactLinkItem[] = [
   {
     name: "Email",
     value: "ikmaldanielazmi@gmail.com",
@@ -36,25 +64,25 @@ const contactLinks = [
   },
 ];
 
-const ACCENTS = {
+const ACCENTS: Record<AccentKey, AccentStyles> = {
   sky: {
     text: "text-sky-400",
     hoverBorder: "hover:border-sky-400/40",
-    hoverBg: "hover:bg-sky-400/[0.04]",
+    hoverBg: "hover:bg-sky-400/4",
     glow: "shadow-[0_0_40px_-10px_rgba(56,189,248,0.4)]",
     iconBg: "group-hover:bg-sky-400/10 group-hover:border-sky-400/30",
   },
   blue: {
     text: "text-blue-400",
     hoverBorder: "hover:border-blue-400/40",
-    hoverBg: "hover:bg-blue-400/[0.04]",
+    hoverBg: "hover:bg-blue-400/4",
     glow: "shadow-[0_0_40px_-10px_rgba(96,165,250,0.4)]",
     iconBg: "group-hover:bg-blue-400/10 group-hover:border-blue-400/30",
   },
   violet: {
     text: "text-violet-400",
     hoverBorder: "hover:border-violet-400/40",
-    hoverBg: "hover:bg-violet-400/[0.04]",
+    hoverBg: "hover:bg-violet-400/4",
     glow: "shadow-[0_0_40px_-10px_rgba(167,139,250,0.4)]",
     iconBg: "group-hover:bg-violet-400/10 group-hover:border-violet-400/30",
   },
@@ -63,7 +91,11 @@ const ACCENTS = {
 // ─────────────────────────────────────────────────────────────
 // Animated background: orbs + grid
 // ─────────────────────────────────────────────────────────────
-function AnimatedBackground({ reduceMotion }) {
+type AnimatedBackgroundProps = {
+  reduceMotion: boolean;
+};
+
+function AnimatedBackground({ reduceMotion }: AnimatedBackgroundProps) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Grid overlay */}
@@ -93,7 +125,7 @@ function AnimatedBackground({ reduceMotion }) {
               }
         }
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute left-1/4 top-1/4 h-[420px] w-[420px] rounded-full bg-sky-500/[0.07] blur-[120px]"
+        className="absolute left-1/4 top-1/4 h-105 w-105 rounded-full bg-sky-500/7 blur-[120px]"
       />
       <motion.div
         animate={
@@ -105,7 +137,7 @@ function AnimatedBackground({ reduceMotion }) {
               }
         }
         transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute right-1/4 top-1/3 h-[380px] w-[380px] rounded-full bg-violet-500/[0.07] blur-[120px]"
+        className="absolute right-1/4 top-1/3 h-95 w-95 rounded-full bg-violet-500/7 blur-[120px]"
       />
       <motion.div
         animate={
@@ -117,11 +149,11 @@ function AnimatedBackground({ reduceMotion }) {
               }
         }
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-1/2 h-[360px] w-[360px] -translate-x-1/2 rounded-full bg-emerald-500/[0.05] blur-[120px]"
+        className="absolute bottom-0 left-1/2 h-90 w-90 -translate-x-1/2 rounded-full bg-emerald-500/5 blur-[120px]"
       />
 
       {/* Top gradient edge */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/15 to-transparent" />
     </div>
   );
 }
@@ -129,14 +161,18 @@ function AnimatedBackground({ reduceMotion }) {
 // ─────────────────────────────────────────────────────────────
 // Availability status pill
 // ─────────────────────────────────────────────────────────────
-function AvailabilityPill({ reduceMotion }) {
+type AvailabilityPillProps = {
+  reduceMotion: boolean;
+};
+
+function AvailabilityPill({ reduceMotion }: AvailabilityPillProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-1.5 text-xs font-medium text-emerald-300"
+      className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/6 px-3 py-1.5 text-xs font-medium text-emerald-300"
     >
       <span className="relative flex h-2 w-2">
         {!reduceMotion && (
@@ -152,12 +188,17 @@ function AvailabilityPill({ reduceMotion }) {
 // ─────────────────────────────────────────────────────────────
 // Contact link card with copy support
 // ─────────────────────────────────────────────────────────────
-function ContactLink({ link, index }) {
+type ContactLinkProps = {
+  link: ContactLinkItem;
+  index: number;
+};
+
+function ContactLink({ link, index }: ContactLinkProps) {
   const [copied, setCopied] = useState(false);
-  const accent = ACCENTS[link.accent] || ACCENTS.sky;
+  const accent = ACCENTS[link.accent] ?? ACCENTS.sky;
   const Icon = link.icon;
 
-  const handleCopy = async (e) => {
+  const handleCopy = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     try {
@@ -215,7 +256,7 @@ function ContactLink({ link, index }) {
           <button
             onClick={handleCopy}
             aria-label={copied ? "Copied" : "Copy email"}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-gray-500 opacity-0 transition-all duration-300 hover:border-white/25 hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/2 text-gray-500 opacity-0 transition-all duration-300 hover:border-white/25 hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
           >
             {copied ? (
               <Check size={14} className="text-emerald-400" />
@@ -238,7 +279,7 @@ function ContactLink({ link, index }) {
 // Main section
 // ─────────────────────────────────────────────────────────────
 export default function Contact() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotion() ?? false;
   const currentYear = new Date().getFullYear();
 
   return (
@@ -273,7 +314,7 @@ export default function Contact() {
             >
               Let&apos;s build
               <br />
-              <span className="bg-gradient-to-r from-white via-sky-200 to-violet-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-white via-sky-200 to-violet-300 bg-clip-text text-transparent">
                 something great
               </span>
               <br />
@@ -306,7 +347,7 @@ export default function Contact() {
                 className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition-all duration-300 hover:bg-gray-100 hover:shadow-[0_0_40px_-8px_rgba(255,255,255,0.5)]"
               >
                 {/* Shine sweep */}
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-black/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 <Sparkles size={16} />
                 Get in touch
                 <ArrowUpRight
@@ -318,7 +359,7 @@ export default function Contact() {
               {/* Secondary CTA */}
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-6 py-3 text-sm font-medium text-gray-300 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/[0.05] hover:text-white"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/2 px-6 py-3 text-sm font-medium text-gray-300 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/5 hover:text-white"
               >
                 View my work
               </a>

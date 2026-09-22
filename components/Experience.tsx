@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { motion, useInView } from "framer-motion";
 import {
   Briefcase,
@@ -17,9 +17,41 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────
+type IconComponent = ComponentType<{
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}>;
+
+type Highlight = {
+  label: string;
+  icon: IconComponent;
+};
+
+type Stat = {
+  label: string;
+  value: string;
+};
+
+type Experience = {
+  role: string;
+  company: string;
+  location: string;
+  period: string;
+  duration: string;
+  description: string;
+  highlights: Highlight[];
+  responsibilities: string[];
+  technologies: string[];
+  stats: Stat[];
+};
+
+// ─────────────────────────────────────────────────────────────
 // Experience data
 // ─────────────────────────────────────────────────────────────
-const experiences = [
+const experiences: Experience[] = [
   {
     role: "Information Technology Intern",
     company: "INTEMATICS SDN BHD",
@@ -62,7 +94,12 @@ const experiences = [
 // ─────────────────────────────────────────────────────────────
 // Reusable: animated badge
 // ─────────────────────────────────────────────────────────────
-function TechBadge({ label, index }) {
+type TechBadgeProps = {
+  label: string;
+  index: number;
+};
+
+function TechBadge({ label, index }: TechBadgeProps) {
   return (
     <motion.span
       initial={{ opacity: 0, y: 8, scale: 0.9 }}
@@ -84,7 +121,13 @@ function TechBadge({ label, index }) {
 // ─────────────────────────────────────────────────────────────
 // Reusable: animated highlight pill
 // ─────────────────────────────────────────────────────────────
-function HighlightPill({ label, Icon, index }) {
+type HighlightPillProps = {
+  label: string;
+  Icon: IconComponent;
+  index: number;
+};
+
+function HighlightPill({ label, Icon, index }: HighlightPillProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -92,7 +135,7 @@ function HighlightPill({ label, Icon, index }) {
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: 0.2 + index * 0.05, duration: 0.4 }}
       whileHover={{ y: -3 }}
-      className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 transition-colors duration-300 hover:border-sky-400/30 hover:bg-sky-400/[0.04]"
+      className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/2 px-3 py-2 transition-colors duration-300 hover:border-sky-400/30 hover:bg-sky-400/4"
     >
       <Icon
         size={15}
@@ -109,7 +152,12 @@ function HighlightPill({ label, Icon, index }) {
 // ─────────────────────────────────────────────────────────────
 // Reusable: animated responsibility item
 // ─────────────────────────────────────────────────────────────
-function ResponsibilityItem({ text, index }) {
+type ResponsibilityItemProps = {
+  text: string;
+  index: number;
+};
+
+function ResponsibilityItem({ text, index }: ResponsibilityItemProps) {
   return (
     <motion.li
       initial={{ opacity: 0, x: -12 }}
@@ -135,8 +183,13 @@ function ResponsibilityItem({ text, index }) {
 // ─────────────────────────────────────────────────────────────
 // Experience card — animated as it scrolls into view
 // ─────────────────────────────────────────────────────────────
-function ExperienceCard({ experience, index }) {
-  const ref = useRef(null);
+type ExperienceCardProps = {
+  experience: Experience;
+  index: number;
+};
+
+function ExperienceCard({ experience, index }: ExperienceCardProps) {
+  const ref = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
@@ -188,8 +241,8 @@ function ExperienceCard({ experience, index }) {
         }}
         className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gray-950 p-6 transition-colors duration-500 hover:border-white/20 md:p-8"
       >
-        {/* Cursor-following subtle glow (top accent) */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        {/* Top accent line on hover */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-sky-400/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -227,7 +280,7 @@ function ExperienceCard({ experience, index }) {
             initial={{ opacity: 0, y: 8 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             transition={{ delay: 0.3 + index * 0.12, duration: 0.5 }}
-            className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-3 py-1.5 text-sm text-gray-400"
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/2 px-3 py-1.5 text-sm text-gray-400"
           >
             <CalendarDays size={14} className="text-sky-400" />
             {experience.period}
@@ -317,7 +370,7 @@ function ExperienceCard({ experience, index }) {
 // Section
 // ─────────────────────────────────────────────────────────────
 export default function Experience() {
-  const timelineRef = useRef(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
   const [lineDrawn, setLineDrawn] = useState(false);
 
   useEffect(() => {
@@ -361,7 +414,7 @@ export default function Experience() {
         <div ref={timelineRef} className="relative">
           {/* Vertical animated line */}
           <div
-            className="absolute left-5 top-0 hidden w-px bg-gradient-to-b from-sky-400/70 via-white/20 to-white/5 transition-[height] duration-[1600ms] ease-out md:block"
+            className="absolute left-5 top-0 hidden w-px bg-linear-to-b from-sky-400/70 via-white/20 to-white/5 transition-[height] duration-1600 ease-out md:block"
             style={{ height: lineDrawn ? "100%" : "0%" }}
           />
 

@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  type ReactNode,
+  type MouseEvent,
+} from "react";
 import {
   motion,
   AnimatePresence,
@@ -22,10 +28,57 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import GithubIcon from "./icon/GithubIcon";
 // ─────────────────────────────────────────────────────────────
-// Project data — enriched with case-study fields
+// Types
 // ─────────────────────────────────────────────────────────────
-const projects = [
+type AccentKey =
+  | "sky"
+  | "violet"
+  | "emerald"
+  | "amber"
+  | "rose"
+  | "cyan"
+  | "orange";
+
+type AccentStyles = {
+  text: string;
+  border: string;
+  glow: string;
+  badge: string;
+  ring: string;
+};
+
+type Project = {
+  id: string;
+  title: string;
+  shortTitle: string;
+  tagline: string;
+  description: string;
+  problem: string;
+  solution: string;
+  features: string[];
+  results: string[];
+  technologies: string[];
+  category: string;
+  github: string;
+  live: string;
+  featured: boolean;
+  dominant?: boolean;
+  images: string[];
+  accent: AccentKey;
+};
+
+type IconComponent = React.ComponentType<{
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}>;
+
+// ─────────────────────────────────────────────────────────────
+// Project data
+// ─────────────────────────────────────────────────────────────
+const projects: Project[] = [
   {
     id: "cfac",
     title: "Campus Facilities Management System",
@@ -229,8 +282,10 @@ const projects = [
   },
 ];
 
+// ─────────────────────────────────────────────────────────────
 // Accent color map — keeps Tailwind classes static so JIT picks them up
-const ACCENTS = {
+// ─────────────────────────────────────────────────────────────
+const ACCENTS: Record<AccentKey, AccentStyles> = {
   sky: {
     text: "text-sky-400",
     border: "hover:border-sky-400/40",
@@ -285,8 +340,14 @@ const ACCENTS = {
 // ─────────────────────────────────────────────────────────────
 // Cursor-tracking wrapper — tilt + glow follows the pointer
 // ─────────────────────────────────────────────────────────────
-function TiltCard({ children, className = "", glowClass = "" }) {
-  const ref = useRef(null);
+type TiltCardProps = {
+  children: ReactNode;
+  className?: string;
+  glowClass?: string;
+};
+
+function TiltCard({ children, className = "", glowClass = "" }: TiltCardProps) {
+  const ref = useRef<HTMLDivElement | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -300,7 +361,7 @@ function TiltCard({ children, className = "", glowClass = "" }) {
   });
 
   const handleMove = useCallback(
-    (e) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       const el = ref.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -329,7 +390,7 @@ function TiltCard({ children, className = "", glowClass = "" }) {
     >
       {/* Cursor-following glow */}
       <div
-        className={`pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 ${glowClass}`}
+        className={`pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 ${glowClass}`}
         style={{
           background: `radial-gradient(500px circle at var(--mx, 50%) var(--my, 50%), rgba(56,189,248,0.10), transparent 40%)`,
         }}
@@ -342,25 +403,36 @@ function TiltCard({ children, className = "", glowClass = "" }) {
 // ─────────────────────────────────────────────────────────────
 // Image carousel with hover parallax + zoom
 // ─────────────────────────────────────────────────────────────
-function ProjectCarousel({ title, images, accent = "sky" }) {
-  const [index, setIndex] = useState(0);
-  const slides = images.length > 0 ? images : [null, null, null];
-  const accentClasses = ACCENTS[accent] || ACCENTS.sky;
+type ProjectCarouselProps = {
+  title: string;
+  images: string[];
+  accent?: AccentKey;
+};
 
-  const prev = (e) => {
+function ProjectCarousel({
+  title,
+  images,
+  accent = "sky",
+}: ProjectCarouselProps) {
+  const [index, setIndex] = useState(0);
+  const slides: (string | null)[] =
+    images.length > 0 ? images : [null, null, null];
+  const accentClasses = ACCENTS[accent] ?? ACCENTS.sky;
+
+  const prev = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIndex((i) => (i === 0 ? slides.length - 1 : i - 1));
   };
 
-  const next = (e) => {
+  const next = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIndex((i) => (i === slides.length - 1 ? 0 : i + 1));
   };
 
   return (
-    <div className="group/carousel relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+    <div className="group/carousel relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-white/3">
       <div
         className="flex h-full transition-transform duration-700 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
@@ -374,13 +446,13 @@ function ProjectCarousel({ title, images, accent = "sky" }) {
               <img
                 src={src}
                 alt={`${title} screenshot ${i + 1}`}
-                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover/card:scale-105"
+                className="h-full w-full object-cover transition-transform duration-1200 ease-out group-hover/card:scale-105"
               />
             </div>
           ) : (
             <div
               key={i}
-              className="flex h-full w-full shrink-0 flex-col items-center justify-center gap-2 bg-gradient-to-br from-white/[0.04] to-transparent text-gray-600"
+              className="flex h-full w-full shrink-0 flex-col items-center justify-center gap-2 bg-linear-to-br from-white/4 to-transparent text-gray-600"
             >
               <ImageIcon size={22} strokeWidth={1.5} />
               <span className="text-xs">Screenshot coming soon</span>
@@ -391,7 +463,7 @@ function ProjectCarousel({ title, images, accent = "sky" }) {
 
       {/* Corner accent line on hover */}
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-current to-transparent opacity-0 transition-opacity duration-500 group-hover/card:opacity-60 ${accentClasses.text}`}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-current to-transparent opacity-0 transition-opacity duration-500 group-hover/card:opacity-60 ${accentClasses.text}`}
       />
 
       {slides.length > 1 && (
@@ -438,8 +510,14 @@ function ProjectCarousel({ title, images, accent = "sky" }) {
 // ─────────────────────────────────────────────────────────────
 // Technology badge with stagger animation
 // ─────────────────────────────────────────────────────────────
-function TechBadge({ label, accent = "sky", index = 0 }) {
-  const accentClasses = ACCENTS[accent] || ACCENTS.sky;
+type TechBadgeProps = {
+  label: string;
+  accent?: AccentKey;
+  index?: number;
+};
+
+function TechBadge({ label, accent = "sky", index = 0 }: TechBadgeProps) {
+  const accentClasses = ACCENTS[accent] ?? ACCENTS.sky;
   return (
     <motion.span
       initial={{ opacity: 0, y: 6 }}
@@ -457,8 +535,14 @@ function TechBadge({ label, accent = "sky", index = 0 }) {
 // ─────────────────────────────────────────────────────────────
 // Main project card
 // ─────────────────────────────────────────────────────────────
-function ProjectCard({ project, index, onOpen }) {
-  const accent = ACCENTS[project.accent] || ACCENTS.sky;
+type ProjectCardProps = {
+  project: Project;
+  index: number;
+  onOpen: (project: Project) => void;
+};
+
+function ProjectCard({ project, index, onOpen }: ProjectCardProps) {
+  const accent = ACCENTS[project.accent] ?? ACCENTS.sky;
   // Alternate slide direction based on index
   const direction = index % 2 === 0 ? -1 : 1;
 
@@ -526,7 +610,7 @@ function ProjectCard({ project, index, onOpen }) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-gray-300 transition hover:border-white/25 hover:text-white"
                 >
-                  <Github size={16} />
+                  <GithubIcon />
                   GitHub
                 </a>
               )}
@@ -564,9 +648,14 @@ function ProjectCard({ project, index, onOpen }) {
 // ─────────────────────────────────────────────────────────────
 // Detail modal — Problem → Solution → Features → Tech → Results
 // ─────────────────────────────────────────────────────────────
-function ProjectModal({ project, onClose }) {
+type ProjectModalProps = {
+  project: Project | null;
+  onClose: () => void;
+};
+
+function ProjectModal({ project, onClose }: ProjectModalProps) {
   if (!project) return null;
-  const accent = ACCENTS[project.accent] || ACCENTS.sky;
+  const accent = ACCENTS[project.accent] ?? ACCENTS.sky;
 
   return (
     <AnimatePresence>
@@ -695,7 +784,7 @@ function ProjectModal({ project, onClose }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-gray-300 transition hover:border-white/25 hover:text-white"
               >
-                <Github size={16} />
+                <GithubIcon />
                 GitHub
               </a>
             )}
@@ -717,9 +806,19 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
-function ModalBlock({ icon, title, text, accent }) {
+// ─────────────────────────────────────────────────────────────
+// Modal block
+// ─────────────────────────────────────────────────────────────
+type ModalBlockProps = {
+  icon: ReactNode;
+  title: string;
+  text: string;
+  accent: AccentStyles;
+};
+
+function ModalBlock({ icon, title, text, accent }: ModalBlockProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+    <div className="rounded-xl border border-white/10 bg-white/2 p-5">
       <div
         className={`mb-2 flex items-center gap-2 text-sm font-medium ${accent.text}`}
       >
@@ -735,7 +834,7 @@ function ModalBlock({ icon, title, text, accent }) {
 // Section
 // ─────────────────────────────────────────────────────────────
 export default function Projects() {
-  const [openProject, setOpenProject] = useState(null);
+  const [openProject, setOpenProject] = useState<Project | null>(null);
 
   return (
     <section id="projects" className="relative bg-gray-950 py-24 sm:py-32">

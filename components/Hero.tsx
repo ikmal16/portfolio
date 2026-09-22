@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Mail, ArrowDown, Download } from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type ElementType,
+} from "react";
+import { Mail, Download } from "lucide-react";
 import GithubIcon from "./icon/GithubIcon";
 import LinkedInIcon from "./icon/LinkedInIcon";
 
@@ -23,8 +29,24 @@ const socials = [
   { icon: Mail, label: "Email", href: "mailto:ikmaldanielazmi@gmail.com" },
 ];
 
-// Staggered entrance helper — every direct child gets a fade-up delay based on index
-function Reveal({ show, index, className = "", children, as: Tag = "div" }) {
+// ─────────────────────────────────────────────────────────────
+// Reveal — typed props
+// ─────────────────────────────────────────────────────────────
+type RevealProps = {
+  show: boolean;
+  index: number;
+  className?: string;
+  children: ReactNode;
+  as?: ElementType;
+};
+
+function Reveal({
+  show,
+  index,
+  className = "",
+  children,
+  as: Tag = "div",
+}: RevealProps) {
   return (
     <Tag
       className={`transition-all duration-700 ease-out ${className}`}
@@ -45,7 +67,7 @@ export default function Hero() {
   const [roleVisible, setRoleVisible] = useState(true);
   const [mouse, setMouse] = useState({ x: 50, y: 50 });
   const [parallaxY, setParallaxY] = useState(0);
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const reducedMotion = useRef(false);
 
   // Trigger entrance animation on mount
@@ -75,9 +97,9 @@ export default function Hero() {
     const el = sectionRef.current;
     if (!el) return;
 
-    let raf = null;
-    const onMove = (e) => {
-      if (raf) return;
+    let raf: number | null = null;
+    const onMove = (e: MouseEvent) => {
+      if (raf !== null) return;
       raf = requestAnimationFrame(() => {
         const rect = el.getBoundingClientRect();
         setMouse({
@@ -89,22 +111,28 @@ export default function Hero() {
     };
 
     el.addEventListener("mousemove", onMove);
-    return () => el.removeEventListener("mousemove", onMove);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Subtle parallax on scroll
   useEffect(() => {
     if (reducedMotion.current) return;
-    let raf = null;
+    let raf: number | null = null;
     const onScroll = () => {
-      if (raf) return;
+      if (raf !== null) return;
       raf = requestAnimationFrame(() => {
         setParallaxY(window.scrollY * 0.15);
         raf = null;
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
@@ -113,7 +141,7 @@ export default function Hero() {
       id="home"
       className="relative flex min-h-screen items-center overflow-hidden bg-black"
     >
-      {/* Local keyframes for effects Tailwind doesn't ship by default */}
+      {/* Local keyframes */}
       <style>{`
         @keyframes float-a {
           0%, 100% { transform: translate(0, 0); }
@@ -135,7 +163,7 @@ export default function Hero() {
         style={{ transform: `translateY(${parallaxY}px)` }}
       >
         <div className="absolute -top-24 right-[-10%] h-112 w-md animate-[float-a_12s_ease-in-out_infinite] rounded-full bg-sky-500/10 blur-[100px] motion-reduce:animate-none" />
-        <div className="absolute bottom-[-15%] left-[-5%] h-72 w-72 animate-[float-b_14s_ease-in-out_infinite] rounded-full bg-white/[0.04] blur-[100px] motion-reduce:animate-none" />
+        <div className="absolute bottom-[-15%] left-[-5%] h-72 w-72 animate-[float-b_14s_ease-in-out_infinite] rounded-full bg-white/4 blur-[100px] motion-reduce:animate-none" />
         <div
           className="absolute inset-0 opacity-[0.15]"
           style={{
@@ -190,7 +218,7 @@ export default function Hero() {
             className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl"
           >
             <span className="text-white">Hi, I&apos;m </span>
-            <span className="bg-[length:200%_auto] bg-gradient-to-r from-sky-200 via-white to-sky-400 bg-clip-text text-transparent [animation:name-shimmer_6s_linear_infinite] motion-reduce:animate-none">
+            <span className="bg-size-[200%_auto] bg-linear-to-r from-sky-200 via-white to-sky-400 bg-clip-text text-transparent animate-[name-shimmer_6s_linear_infinite] motion-reduce:animate-none">
               Ikmal.
             </span>
           </Reveal>
@@ -227,7 +255,7 @@ export default function Hero() {
               className="group relative overflow-hidden rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98]"
             >
               <span className="relative z-10">View My Projects</span>
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-black/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </a>
 
             <a
