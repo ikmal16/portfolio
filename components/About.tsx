@@ -796,7 +796,7 @@ export default function About() {
               </a>
 
               <a
-                href="/Muhammad_Ikmal_Daniel_Resume.pdf"
+                href="/Muhammad_Ikmal_Daniel_Resume. (2).pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:border-white/40 hover:bg-white/5"

@@ -468,7 +468,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="/Muhammad_Ikmal_Daniel_Resume.pdf"
+                href="/Muhammad_Ikmal_Daniel_Resume. (2).pdf"
                 download="Ikmal-Daniel-Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
