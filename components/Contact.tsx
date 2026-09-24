@@ -56,8 +56,8 @@ const contactLinks: ContactLinkItem[] = [
   },
   {
     name: "GitHub",
-    value: "github.com/yourusername",
-    href: "https://github.com/",
+    value: "github.com/ikmal16",
+    href: "https://github.com/ikmal16",
     icon: GithubIcon,
     accent: "violet",
     copyable: false,

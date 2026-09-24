@@ -14,6 +14,12 @@ import {
   FolderTree,
   Sparkles,
   CheckCircle2,
+  Wrench,
+  Settings,
+  Network,
+  Monitor,
+  Users,
+  CreditCard,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
@@ -87,6 +93,41 @@ const experiences: Experience[] = [
       { label: "Duration", value: "6 months" },
       { label: "Technologies", value: "6+" },
       { label: "Focus", value: "Full-Stack" },
+    ],
+  },
+  {
+    role: "IT Support Technician",
+    company: "CYBER CAFE JENGKA 16",
+    location: "Bandar Jengka, Pahang",
+    period: "January 2018 – December 2018",
+    duration: "1 year",
+    description:
+      "Worked as a Cyber Cafe Technician, gaining hands-on experience in hardware troubleshooting, software maintenance, network configuration, and customer service.",
+    highlights: [
+      { label: "Hardware Troubleshooting", icon: Wrench },
+      { label: "Software Maintenance", icon: Settings },
+      { label: "Network Configuration", icon: Network },
+      { label: "System Support", icon: Monitor },
+      { label: "Customer Service", icon: Users },
+      { label: "Payment Handling", icon: CreditCard },
+    ],
+    responsibilities: [
+      "Diagnosed and resolved hardware and software issues to maintain reliable system performance across customer workstations.",
+      "Configured and maintained game file servers, ensuring stable network connectivity and efficient software deployment.",
+      "Provided customer support to an average of 50+ customers daily, handling payments accurately and ensuring a seamless user experience.",
+    ],
+    technologies: [
+      "Hardware Troubleshooting",
+      "Windows",
+      "Network Configuration",
+      "File Servers",
+      "Software Deployment",
+      "System Maintenance",
+    ],
+    stats: [
+      { label: "Duration", value: "1 year" },
+      { label: "Customers", value: "50+ daily" },
+      { label: "Focus", value: "IT Support" },
     ],
   },
 ];
