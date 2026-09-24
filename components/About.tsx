@@ -117,7 +117,8 @@ const highlights: Highlight[] = [
   {
     icon: Briefcase,
     title: "Experience",
-    description: "6-month IT internship at INTEMATICS SDN BHD",
+    description:
+      "6-month IT internship at INTEMATICS SDN BHD and a year of IT support experience",
   },
   {
     icon: MapPin,
