@@ -182,6 +182,15 @@ const techs: Tech[] = [
     usedIn: ["va"],
     related: ["python", "fastapi"],
   },
+  {
+    id: "Microsoft SQL Server",
+    name: "Microsoft SQL Server",
+    category: "database",
+    role: "Relational Database",
+    description: "Relational schema design, queries, and data integrity.",
+    usedIn: ["va"],
+    related: ["python", "fastapi"],
+  },
   // Tools
   {
     id: "git",
