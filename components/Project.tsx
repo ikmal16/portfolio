@@ -219,6 +219,48 @@ const projects: Project[] = [
     ],
     accent: "orange",
   },
+
+  {
+    id: "srpa",
+    title: "Sistem Rekod Pelajar Antarabangsa",
+    shortTitle: "SRPA",
+    tagline: "Full-Stack · Student Management",
+    description:
+      "A web-based system for managing international student records, passport expiry information, and academic details with role-based access.",
+    problem:
+      "Managing international student records requires efficient access to student information, passport validity, and accurate record keeping.",
+    solution:
+      "Developed a full-stack student management system with a Laravel REST API, Oracle database integration, and a React interface for managing and retrieving student records.",
+    features: [
+      "Student record management (CRUD)",
+      "Search, filtering, and pagination",
+      "Passport expiry status tracking",
+      "CSV and Excel import/export",
+      "Role-based access for officers and lecturers",
+      "Student reports and country data integration",
+    ],
+    results: [
+      "Centralized international student records",
+      "Simplified student search and record management",
+      "Improved visibility of passport expiry information",
+    ],
+    technologies: [
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Laravel",
+      "Oracle AI Database 26ai",
+      "REST API",
+    ],
+    category: "Full-Stack Web Application",
+    filter: "fullstack",
+    github: "#",
+    live: "#",
+    featured: true,
+    dominant: false,
+    images: ["/complaint (1).png", "/complaint (2).png", "/complaint (3).png"],
+    accent: "violet",
+  },
 ];
 
 const FILTERS: { id: FilterId; label: string }[] = [
