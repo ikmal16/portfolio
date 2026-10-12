@@ -219,7 +219,6 @@ const projects: Project[] = [
     ],
     accent: "orange",
   },
-
   {
     id: "srpa",
     title: "Sistem Rekod Pelajar Antarabangsa",
@@ -258,7 +257,7 @@ const projects: Project[] = [
     live: "#",
     featured: true,
     dominant: false,
-    images: ["/complaint (1).png", "/complaint (2).png", "/complaint (3).png"],
+    images: ["/srpa1.png", "/srpa2.png"],
     accent: "violet",
   },
 ];
